@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to Speech</title>
+    <title>File to Speech</title>
     <style>
         /* Global Styles */
         * {
@@ -12,19 +12,19 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
-
+    
         body {
             background-color: #f4f4f4;
             color: #333;
             text-align: center;
             padding: 20px;
         }
-
+    
         h2 {
             color: #007bff;
             margin-bottom: 15px;
         }
-
+    
         /* Form Container */
         .form-container {
             background: white;
@@ -34,14 +34,14 @@
             max-width: 400px;
             margin: 0 auto;
         }
-
+    
         form {
             display: flex;
             flex-direction: column;
             gap: 10px;
             align-items: center;
         }
-
+    
         input[type="file"] {
             padding: 10px;
             border: 2px solid #007bff;
@@ -50,7 +50,7 @@
             cursor: pointer;
             background: #fff;
         }
-
+    
         button {
             background: #007bff;
             color: white;
@@ -61,11 +61,11 @@
             transition: 0.3s;
             width: 100%;
         }
-
+    
         button:hover {
             background: #0056b3;
         }
-
+    
         /* Audio Output Section */
         .audio-section {
             margin-top: 20px;
@@ -76,12 +76,12 @@
             max-width: 400px;
             margin: 20px auto;
         }
-
+    
         audio {
             width: 100%;
             margin-top: 10px;
         }
-
+    
         a {
             display: inline-block;
             background: #28a745;
@@ -92,11 +92,11 @@
             transition: 0.3s;
             margin-top: 10px;
         }
-
+    
         a:hover {
             background: #218838;
         }
-
+    
         /* Responsive Design */
         @media (max-width: 600px) {
             .form-container, .audio-section {
@@ -106,27 +106,28 @@
     </style>
 </head>
 <body>
-
-    <h2>Upload a PDF File</h2>
-
+    <h2>Upload a File (PDF, TXT, or Image)</h2>
     <div class="form-container">
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".pdf" required>
-            <button type="submit">Convert to Speech</button>
-        </form>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf,.txt,.jpg,.jpeg,.png" required>
+        <button type="submit">Convert to Speech</button>
+    </form>
     </div>
 
     {% if audio_file %}
     <div class="audio-section">
-        <h3>Audio Output</h3>
-        <audio controls>
-            <source src="{{ audio_file }}" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-        <br>
-        <a href="/download">Download Audio</a>
-    </div>
-    {% endif %}
 
+    <h3>Audio Output</h3>
+
+    <audio controls>
+        <source src="{{ audio_file }}" type="audio/mpeg">
+        Your browser does not support audio.
+    </audio>
+    <br>
+    <a href="/download">Download Audio</a>
+</div>
+
+    {% endif %}
 </body>
 </html>

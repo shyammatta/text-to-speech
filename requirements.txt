@@ -1,4 +1,6 @@
 flask
 gtts
 pymupdf
-guncicorn
+pytesseract
+pillow
+gunicorn
