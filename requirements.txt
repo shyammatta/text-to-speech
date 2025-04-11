@@ -1,0 +1,4 @@
+flask
+gtts
+pymupdf
+guncicorn
