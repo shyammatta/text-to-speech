@@ -5,10 +5,6 @@ import fitz  # PyMuPDF for PDFs
 import pytesseract  # OCR for images
 from PIL import Image
 
-# For Windows (Modify the path if needed)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-
 app = Flask(__name__)
 
 # Folders
@@ -17,56 +13,70 @@ AUDIO_FOLDER = "static/audio"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(AUDIO_FOLDER, exist_ok=True)
 
+# Set Tesseract path dynamically for Windows/Linux
+if os.name == "nt":  # Windows
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:  # Linux (Render, AWS, etc.)
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+
 # Function to extract text
 def extract_text(file_path, file_type):
-    text = ""
-    if file_type == 'pdf':
-        doc = fitz.open(file_path)
-        for page in doc:
-            text += page.get_text("text") + "\n"
-    elif file_type == 'txt':
-        with open(file_path, "r", encoding="utf-8") as f:
-            text = f.read()
-    elif file_type in ['jpg', 'jpeg', 'png']:
-        image = Image.open(file_path)
-        text = pytesseract.image_to_string(image)
-    return text.strip()
+    try:
+        text = ""
+        if file_type == "pdf":
+            doc = fitz.open(file_path)
+            for page in doc:
+                text += page.get_text("text") + "\n"
+        elif file_type == "txt":
+            with open(file_path, "r", encoding="utf-8") as f:
+                text = f.read()
+        elif file_type in ["jpg", "jpeg", "png"]:
+            image = Image.open(file_path)
+            text = pytesseract.image_to_string(image)
+        return text.strip()
+    except Exception as e:
+        return f"Error extracting text: {str(e)}"
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html', audio_file=None)
+    return render_template("index.html", audio_file=None)
 
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["GET", "POST"])
 def upload_file():
-    if 'file' not in request.files:
-        return "No file uploaded"
-    
-    file = request.files['file']
-    if file.filename == '':
-        return "No file selected"
+    if request.method == "GET":
+        return "Upload a file via POST request", 405
 
-    file_extension = file.filename.split('.')[-1].lower()
-    if file_extension not in ['pdf', 'txt', 'jpg', 'jpeg', 'png']:
-        return "Unsupported file format. Please upload a PDF, Text, or Image file."
+    if "file" not in request.files:
+        return "No file uploaded", 400
+    
+    file = request.files["file"]
+    if file.filename == "":
+        return "No file selected", 400
+
+    file_extension = file.filename.split(".")[-1].lower()
+    if file_extension not in ["pdf", "txt", "jpg", "jpeg", "png"]:
+        return "Unsupported file format. Please upload a PDF, Text, or Image file.", 400
     
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(file_path)
 
     text = extract_text(file_path, file_extension)
 
-    if not text:
-        return "No text found in the file."
+    if not text.strip():
+        return "No text found in the file.", 400
 
-    audio_path = os.path.join(AUDIO_FOLDER, 'output.mp3')
-    tts = gTTS(text)
-    tts.save(audio_path)
+    try:
+        audio_path = os.path.join(AUDIO_FOLDER, "output.mp3")
+        tts = gTTS(text)
+        tts.save(audio_path)
+        return render_template("index.html", audio_file=url_for("static", filename="audio/output.mp3"))
+    except Exception as e:
+        return f"Error generating speech: {str(e)}", 500
 
-    return render_template('index.html', audio_file=url_for('static', filename='audio/output.mp3'))
-
-@app.route('/download')
+@app.route("/download")
 def download_audio():
-    audio_path = os.path.join(AUDIO_FOLDER, 'output.mp3')
+    audio_path = os.path.join(AUDIO_FOLDER, "output.mp3")
     return send_file(audio_path, as_attachment=True)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

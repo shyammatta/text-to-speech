@@ -1,0 +1,261 @@
+postgre SQL
+===========================
+
+day1
+======================
+
+what is a database
+--------------------
+A database is place  where we can  store, manipulate and retrieve the data .
+
+postegresql is a database engine
+
+sql is a structured query launguge
+
+sql
+====
+
+sql is a programming laungage that allows to have
+
+-> select first_name from person
+-> sql mange data held in a relational database
+-> easy to learn
+->very powerful
+->1974
+->used all over the internet
+
+how data is stored
+-------------------
+->data is stored in tables
+->column
+->rows
+
+sql relational database
+->bcs it tell abouts relations between the tables.
+
+PostgresSQL
+=============
+->it is a object -relational database management system
+->modern
+->open source
+
+limit
+---------
+limit gives certain of columns ->limit 5->gives 5 rows of data
+
+offset
+-----------
+offset gives after values
+
+ex: select * from person offset 5 limit 5 ; o/p-> 6 to 10
+
+for ex:
+offset 5 limit 5 -->gives output of 6 to 10
+
+fetch
+-----------
+select * from person offset 5 fetch first 1 row only;
+
+it is same like limit but it is sequal.
+it gives output clearly
+
+in
+=======
+in gives the multiple countries select at one time
+
+
+ex:select * from person country in('chile','china');
+
+between
+==========
+between gives the between values;
+it gives the range of values
+
+like
+====
+test=# select * from person where first_name like '%a';
+
+it gives values ending with a.
+
+count
+=====
+
+ex: select country, count(*) from person where group by country.
+ex: select country, count(*) from person where group by country order by country.(gives order by country)
+
+having keyword
+================
+
+having keyword works with group by and used for extra filtering. after you perform the aggregation.in our case ,we have coun and count is simply summing
+
+ex: test=# select country,count(*) from person group by country having count(*)>50 order by country ;
+  country  | count
+-----------+-------
+ China     |   158
+ Indonesia |    98
+ Russia    |    56
+(3 rows)
+
+Aggregate Functions
+======================
+Max and min
+================
+
+test=# select MAX(price) from car;
+    max
+-----------
+ $99940.65
+(1 row)
+
+
+test=# select MIN(price) from car;
+   min
+----------
+ $1004.98
+(1 row)
+
+AVG
+=====
+test=# select AVG(price) from car;
+
+gives average value of car.
+
+max
+===
+select make,model,max(price) from car group by make,model ;
+select make,model,min(price) from car group by make,model ;
+
+order by
+=========
+it gives order like ascending order or descending order.
+
+group by
+==========
+combing the group rows with same name of column
+
+
+Arthematic operator section
+===============================
+test=# select make,model,price,round(price * .10,2),round(price-(price*0.10)) from cars;
+it can be used to find values by athematic operators.
+
+as(alias)
+==========
+it is used to name the columns
+
+test=# select make,model,price as original_price,round(price * .10,2) as ten_perc_discount,round(price-(price*0.10),2) as discounted_price from cars;
+     make      |    model     | original_price | ten_perc_discount | discounted_price
+---------------+--------------+----------------+-------------------+------------------
+ Chevrolet     | Volt         |           7410 |            741.00 |          6669.00
+ Suzuki        | Grand Vitara |          15902 |           1590.20 |         14311.80
+ Mercedes-Benz | E-Class      |          34955 |           3495.50 |         31459.50
+ Mercury       | Mystique     |          60941 |           6094.10 |         54846.90
+ BMW           | 7 Series     |          21404 |           2140.40 |         19263.60
+ Buick         | Century      |          74836 |           7483.60 |         67352.40
+ Ford          | Mustang      |           2335 |            233.50 |          2101.50
+ Hyundai       | XG300        |          95292 |           9529.20 |         85762.80
+ Daewoo        | Leganza      |          44731 |           4473.10 |         40257.90
+ Suzuki        | Swift        |          66108 |           6610.80 |         59497.20
+(10 rows)
+
+COALESCE
+=============
+it is used to give the default value after null valu
+
+test=# select coalesce(email,'email not privided') from person;
+->so the empty spaces in person table email column filled with email not provided value.
+
+NULLIF
+=========
+->when two values are existed it will take first value.
+->when both values are same then it takes null value
+->it can used when we do divison error not getting error.
+ex:
+
+select 10/0
+
+initially we will get error.
+
+But after performing null if we will normal value which we are initiated.example cab be shown below
+
+test=# select nullif(10,19);
+ nullif
+--------
+     10
+(1 row)
+test=# select nullif(10,10);
+ nullif
+--------
+(1 row)
+test=# select coalesce(10/ nullif(0,0),0);
+ coalesce
+----------
+        0
+(1 row)
+By performing above condition we will not get any error.
+
+dates and timestamps
+=======================
+
+select now()
+
+output:gives now time starting with date
+
+ex:
+test=# select now();
+               now
+----------------------------------
+ 2025-04-09 21:31:24.969171+05:30
+(1 row)
+
+only date
+==========
+test=# SELECT NOW()::DATE;
+    now
+------------
+ 2025-04-09
+(1 row)
+
+only time
+================
+
+
+test=# SELECT NOW()::TIME;
+       now
+-----------------
+ 21:40:52.604684
+(1 row)
+
+Adding and subtracting with dates
+======================================
+
+subtracting the now time with 1 year,10 years,10 months,10 days
+
+test=# select now()-INTERVAL '1 YEAR';
+             ?column?
+----------------------------------
+ 2024-04-09 21:46:09.633026+05:30
+(1 row)
+
+
+test=# select now()-INTERVAL '10 YEARS';
+             ?column?
+----------------------------------
+ 2015-04-09 21:46:20.769487+05:30
+(1 row)
+
+test=# select now()-INTERVAL '10 MONTHS';
+             ?column?
+----------------------------------
+ 2024-06-09 21:47:08.240336+05:30
+(1 row)
+
+test=# select now()-INTERVAL '10 DAYS';
+             ?column?
+----------------------------------
+ 2025-03-30 21:48:38.217128+05:30
+(1 row)
+
+
+
+
